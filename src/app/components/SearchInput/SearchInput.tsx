@@ -1,9 +1,13 @@
 import { IconButton } from "@crayonai/react-ui";
 import clsx from "clsx";
 import { SearchIcon, StopCircleIcon } from "lucide-react";
+import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
+import { SearchProvider } from "@/app/api/types/searchProvider";
 import { useSharedUIState } from "@/app/context/UIStateContext";
+
+import { Select } from "../Select";
 
 import styles from "./SearchInput.module.scss";
 
@@ -43,7 +47,7 @@ export const SearchInput = ({
   return (
     <div
       className={clsx(
-        "flex items-center",
+        "flex items-center gap-xs",
         styles.searchContainer,
         {
           [styles.searchGlow]: isSearching,
@@ -62,6 +66,30 @@ export const SearchInput = ({
         onKeyDown={handleKeyDown}
         autoFocus
       />
+      {!state.isLoading && (
+        <Select
+          label="Search Providers"
+          options={[
+            {
+              label: "Gemini",
+              value: SearchProvider.GEMINI,
+              icon: (
+                <Image src="/gemini.svg" width={10} height={10} alt="Gemini" />
+              ),
+            },
+            {
+              label: "Exa",
+              value: SearchProvider.EXA,
+              icon: <Image src="/exa.svg" width={10} height={10} alt="Exa" />,
+            },
+          ]}
+          placeholder="Select search provider"
+          value={state.searchProvider}
+          onChange={(value) => {
+            actions.setSearchProvider(value as SearchProvider);
+          }}
+        />
+      )}
       {state.isLoading && (
         <IconButton
           icon={<StopCircleIcon />}

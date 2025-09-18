@@ -4,6 +4,7 @@ import { makeC1Response } from "@thesysai/genui-sdk/server";
 import { NextRequest } from "next/server";
 
 import { getThread } from "../cache/threadCache";
+import { SearchProvider, SearchProviderConfig } from "../types/searchProvider";
 
 import { findCachedTurn } from "./lib/findCachedTurn";
 import { generateAndStreamC1Response } from "./lib/generateAndStreamC1Response";
@@ -12,6 +13,8 @@ import { getSearchResponse } from "./lib/getSearchResponse";
 interface AskRequest {
   prompt: string;
   threadId: string;
+  searchProvider?: SearchProvider;
+  numResults?: number;
 }
 
 /**
@@ -72,8 +75,19 @@ export async function POST(req: NextRequest) {
     return new Response("Request aborted", { status: 499 });
   }
 
-  const { prompt, threadId: reqThreadId } = (await req.json()) as AskRequest;
+  const {
+    prompt,
+    threadId: reqThreadId,
+    searchProvider = SearchProvider.EXA,
+    numResults = 10,
+  } = (await req.json()) as AskRequest;
   threadId = reqThreadId;
+
+  // Create search provider configuration
+  const searchConfig: SearchProviderConfig = {
+    provider: searchProvider,
+    numResults,
+  };
 
   const generateResponse = async () => {
     try {
@@ -113,6 +127,7 @@ export async function POST(req: NextRequest) {
         threadHistory,
         c1Response,
         req.signal,
+        searchConfig,
       );
 
       if (!assistantMessage) {

@@ -1,3 +1,5 @@
+import { SearchProvider } from "../api/types/searchProvider";
+
 /**
  * Type definition for parameters required by the makeApiCall function.
  * This includes both the API request parameters and state management callbacks.
@@ -5,6 +7,8 @@
 export type ApiCallParams = {
   /** The search query to be sent to the API */
   searchQuery: string;
+  /** The search provider to use */
+  searchProvider: SearchProvider;
   /** Callback to update the response state */
   setC1Response: (response: string) => void;
   /** Callback to update the loading state */
@@ -15,6 +19,8 @@ export type ApiCallParams = {
   setAbortController: (controller: AbortController | null) => void;
   /** The ID of the thread to associate with the API call */
   threadId?: string;
+  /** The number of results to return */
+  numResults?: number;
 };
 
 /**
@@ -78,10 +84,12 @@ export const validateThread = async (
 export const makeApiCall = async ({
   searchQuery,
   threadId,
+  searchProvider,
   setC1Response,
   setIsLoading,
   abortController,
   setAbortController,
+  numResults,
 }: ApiCallParams): Promise<ApiCallResponse> => {
   try {
     // Cancel any ongoing request before starting a new one
@@ -103,6 +111,8 @@ export const makeApiCall = async ({
       body: JSON.stringify({
         prompt: searchQuery,
         threadId,
+        searchProvider,
+        numResults,
       }),
       signal: newAbortController.signal,
     });

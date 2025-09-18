@@ -8,12 +8,53 @@ import {
   AssistantMessage,
   ThreadMessage,
 } from "../../cache/threadCache";
+import {
+  UnifiedSearchResponse,
+  isGeminiResponse,
+  isExaResponse,
+} from "../../types/unifiedSearchResponse";
 import { SYSTEM_PROMPT } from "../systemPrompt";
 
 const client = new OpenAI({
   baseURL: "https://api.thesys.dev/v1/visualize",
   apiKey: process.env.THESYS_API_KEY,
 });
+
+/**
+ * Formats a search response for the LLM based on the provider type
+ */
+const formatSearchResponseForLLM = (
+  searchResponse?: UnifiedSearchResponse,
+): string => {
+  if (!searchResponse) {
+    return "No search results available.";
+  }
+
+  if (isGeminiResponse(searchResponse)) {
+    return searchResponse.content;
+  }
+
+  if (isExaResponse(searchResponse)) {
+    return `Search Query: ${searchResponse.searchQuery}
+
+Search Results from Exa:
+${searchResponse.results
+  .map(
+    (result, index) => `
+${index + 1}. ${result.title}
+   URL: ${result.url}
+   Published: ${result.publishedDate || "Unknown"}
+   Author: ${result.author || "Unknown"}
+   Content: ${result.content || result.snippet || "No content available"}
+`,
+  )
+  .join("\n")}
+
+Please provide a comprehensive response based on these search results.`;
+  }
+
+  return JSON.stringify(searchResponse);
+};
 
 /**
  * Generates the C1 response and streams it back to the client.
@@ -81,7 +122,7 @@ export const generateAndStreamC1Response = async ({
         role: "assistant",
         content: errorMessage
           ? `There was an error during the search: ${errorMessage}. Please respond to the user gracefully.`
-          : JSON.stringify(assistantMessage.searchResponse),
+          : formatSearchResponseForLLM(assistantMessage.searchResponse),
       },
     ],
     stream: true,
