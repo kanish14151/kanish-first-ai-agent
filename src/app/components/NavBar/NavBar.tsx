@@ -4,10 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { useSharedUIState } from "@/app/context/UIStateContext";
-import { useIsMobile } from "@/app/hooks/useIsMobile";
 
 export const NavBar = () => {
-  const isMobile = useIsMobile();
   const { actions } = useSharedUIState();
 
   return (
@@ -33,8 +31,7 @@ export const NavBar = () => {
           </Link>
         </div>
         {/* Buttons have been removed from here */}
-        <div className="flex items-center gap-2">
-        </div>
+        <div className="flex items-center gap-2"></div>
       </div>
     </div>
   );

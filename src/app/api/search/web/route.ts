@@ -2,6 +2,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
+import { GoogleSearchServiceError } from "../../services/googleSearchConfig";
 import { googleWebSearch } from "../../services/googleWebSearch";
 import { GoogleWebSearchRequest } from "../../types/search";
 
@@ -37,6 +38,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(response);
   } catch (error) {
     console.error("Error in web search endpoint:", error);
+
+    if (error instanceof GoogleSearchServiceError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.statusCode },
+      );
+    }
 
     const message =
       error instanceof Error ? error.message : "Internal server error";

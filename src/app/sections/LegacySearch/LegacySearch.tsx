@@ -3,10 +3,10 @@
 import Image from "next/image";
 import { useState, useEffect, useCallback } from "react";
 
+import SearchResults from "./SearchResults";
+
 import { GoogleCustomSearchResponseItem } from "@/app/api/types/search";
 import { webSearch } from "@/app/utils/secureSearchApi";
-
-import SearchResults from "./SearchResults";
 
 interface SearchPageProps {
   query: string;

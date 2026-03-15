@@ -2,12 +2,12 @@ import clsx from "clsx";
 import Image from "next/image";
 import React from "react";
 
-import { useSharedUIState } from "@/app/context/UIStateContext";
-import { useIsMobile } from "@/app/hooks/useIsMobile";
-
 import { SearchInput } from "../../components/SearchInput";
 
 import styles from "./LandingView.module.scss";
+
+import { useSharedUIState } from "@/app/context/UIStateContext";
+import { useIsMobile } from "@/app/hooks/useIsMobile";
 
 export const LandingView = () => {
   const isMobile = useIsMobile();

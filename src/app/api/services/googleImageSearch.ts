@@ -2,8 +2,10 @@ import axios from "axios";
 
 import { GoogleImageSearchResponse } from "../types/search";
 
-const apiKey = process.env.GOOGLE_API_KEY;
-const cx = process.env.GOOGLE_CX_KEY;
+import {
+  getGoogleSearchConfig,
+  normalizeGoogleSearchError,
+} from "./googleSearchConfig";
 
 /**
  * Searches for an image using the Google Custom Search API.
@@ -12,6 +14,7 @@ const cx = process.env.GOOGLE_CX_KEY;
  * or a placeholder if an error occurs or no image is found.
  */
 export const searchImage = async (query: string) => {
+  const { apiKey, cx } = getGoogleSearchConfig();
   const axiosInstance = axios.create({
     baseURL: "https://www.googleapis.com/customsearch/v1",
   });
@@ -37,7 +40,13 @@ export const searchImage = async (query: string) => {
       url: response.data.items[0]?.link ?? "",
       thumbnailUrl: response.data.items[0]?.image?.thumbnailLink ?? "",
     };
-  } catch {
+  } catch (error) {
+    try {
+      normalizeGoogleSearchError(error);
+    } catch (normalizedError) {
+      console.error("Error in image search service:", normalizedError);
+    }
+
     return {
       url: "https://via.placeholder.com/360x240",
       thumbnailUrl: "https://via.placeholder.com/360x240",

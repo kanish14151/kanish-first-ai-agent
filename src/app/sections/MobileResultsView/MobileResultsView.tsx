@@ -2,13 +2,13 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@crayonai/react-ui";
 import clsx from "clsx";
 import React, { useState } from "react";
 
-import { useSharedUIState } from "@/app/context/UIStateContext";
-
 import { C1Response } from "../../components/C1Response";
 import { SearchInput } from "../../components/SearchInput";
 import LegacySearch from "../LegacySearch/LegacySearch";
 
 import styles from "./MobileResultsView.module.scss";
+
+import { useSharedUIState } from "@/app/context/UIStateContext";
 
 export const MobileResultsView = () => {
   const { state, handleSearch } = useSharedUIState();

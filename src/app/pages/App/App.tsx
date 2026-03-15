@@ -4,9 +4,6 @@ import { themePresets } from "@crayonai/react-ui/ThemeProvider";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
-import { DesktopResultsView } from "@/app/sections/DesktopResultsView";
-import { MobileResultsView } from "@/app/sections/MobileResultsView";
-
 import { NavBar } from "../../components/NavBar/NavBar";
 import {
   UIStateProvider,
@@ -14,6 +11,9 @@ import {
 } from "../../context/UIStateContext";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { LandingView } from "../../sections/LandingView";
+
+import { DesktopResultsView } from "@/app/sections/DesktopResultsView";
+import { MobileResultsView } from "@/app/sections/MobileResultsView";
 
 import "@crayonai/react-ui/styles/index.css";
 

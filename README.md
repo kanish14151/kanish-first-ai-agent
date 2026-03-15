@@ -81,6 +81,8 @@ Unlike traditional search engines that show a list of links or AI platforms that
 
    Exa for neural web search. Generate a key at https://exa.ai/
 
+   Note: older code paths may reference `GOOGLE_CX_KEY`, but `GOOGLE_CX` is the canonical variable name and is now supported everywhere.
+
 ### Development
 
 Run the development server:

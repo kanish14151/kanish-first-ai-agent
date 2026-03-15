@@ -4,12 +4,12 @@ import { SearchIcon, StopCircleIcon } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
-import { SearchProvider } from "@/app/api/types/searchProvider";
-import { useSharedUIState } from "@/app/context/UIStateContext";
-
 import { Select } from "../Select";
 
 import styles from "./SearchInput.module.scss";
+
+import { SearchProvider } from "@/app/api/types/searchProvider";
+import { useSharedUIState } from "@/app/context/UIStateContext";
 
 interface SearchInputProps {
   value: string;

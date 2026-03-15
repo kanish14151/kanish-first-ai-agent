@@ -14,6 +14,14 @@ import { UIActions, UIState } from "./useUIState";
 const QUERY_PARAM_THREAD_ID = "tid";
 const QUERY_PARAM_QUERY = "q";
 
+type LatestSearchState = {
+  abortController: AbortController | null;
+  currentQuery: string;
+  handleThreadAction: (query: string) => Promise<void>;
+  isLoading: boolean;
+  query: string;
+};
+
 export const useSearchHandler = (
   state: UIState,
   actions: UIActions,
@@ -28,6 +36,19 @@ export const useSearchHandler = (
   const isSearching = useRef(false);
   const isSearchAborted = useRef(false);
   const hasValidatedInitialThread = useRef(false);
+  const performSearchRef = useRef<
+    (query: string, generateThreadId: boolean) => Promise<void>
+  >(async () => undefined);
+  const handleThreadActionRef = useRef<(query: string) => Promise<void>>(
+    async () => undefined,
+  );
+  const latestSearchStateRef = useRef<LatestSearchState>({
+    abortController: actions.abortController,
+    currentQuery: "",
+    handleThreadAction: async (_query: string) => {},
+    isLoading: state.isLoading,
+    query: state.query,
+  });
 
   const currentQuery = useMemo(() => {
     const query = decodeURIComponent(searchParams.get(QUERY_PARAM_QUERY) || "");
@@ -111,12 +132,13 @@ export const useSearchHandler = (
 
   // Validate thread on initial load using utility function
   useEffect(() => {
-    handleInitialThreadValidation(
+    void handleInitialThreadValidation(
       currentQuery,
       threadIdParam,
       hasValidatedInitialThread,
       state.isLoading,
-      performSearch,
+      (query, generateThreadId) =>
+        performSearchRef.current(query, generateThreadId),
     );
   }, [currentQuery, threadIdParam, state.isLoading]);
 
@@ -134,23 +156,41 @@ export const useSearchHandler = (
     [performSearch],
   );
 
+  performSearchRef.current = performSearch;
+  handleThreadActionRef.current = handleThreadAction;
+  latestSearchStateRef.current = {
+    abortController: actions.abortController,
+    currentQuery,
+    handleThreadAction,
+    isLoading: state.isLoading,
+    query: state.query,
+  };
+
   useEffect(() => {
     if (isSearchAborted.current) {
-      handleThreadAction(currentQuery);
+      void handleThreadActionRef.current(latestSearchStateRef.current.currentQuery);
       isSearchAborted.current = false;
     }
   }, [state.isLoading]);
 
   useEffect(() => {
-    if (state.query === currentQuery) {
+    const {
+      abortController,
+      currentQuery: latestCurrentQuery,
+      handleThreadAction: latestHandleThreadAction,
+      isLoading,
+      query,
+    } = latestSearchStateRef.current;
+
+    if (query === latestCurrentQuery) {
       return;
     }
 
-    if (state.isLoading && isSearching.current) {
-      actions.abortController?.abort();
+    if (isLoading && isSearching.current) {
+      abortController?.abort();
       isSearchAborted.current = true;
-    } else if (!state.isLoading && !isSearching.current) {
-      handleThreadAction(currentQuery);
+    } else if (!isLoading && !isSearching.current) {
+      void latestHandleThreadAction(latestCurrentQuery);
     }
   }, [currentQuery]);
 

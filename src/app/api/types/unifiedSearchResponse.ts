@@ -1,5 +1,18 @@
 import { SearchProvider } from "./searchProvider";
 
+type UnifiedSearchMetadataValue =
+  | boolean
+  | null
+  | number
+  | string
+  | undefined;
+
+type UnifiedSearchMetadata = {
+  numResults?: number;
+  searchTime?: number;
+  [key: string]: UnifiedSearchMetadataValue;
+};
+
 /**
  * Unified search response that works with both Gemini and Exa search providers
  */
@@ -15,11 +28,7 @@ export interface UnifiedSearchResponse {
     publishedDate?: string;
     author?: string;
   }>; // For Exa's structured results
-  metadata?: {
-    numResults?: number;
-    searchTime?: number;
-    [key: string]: any;
-  };
+  metadata?: UnifiedSearchMetadata;
 }
 
 /**

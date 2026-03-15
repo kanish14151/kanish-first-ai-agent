@@ -3,10 +3,10 @@
 import { C1Component } from "@thesysai/genui-sdk";
 import React from "react";
 
+import styles from "./C1Response.module.scss";
+
 import { useSharedUIState } from "@/app/context/UIStateContext";
 import { imageSearch } from "@/app/utils/secureSearchApi";
-
-import styles from "./C1Response.module.scss";
 
 interface C1ResponseProps {
   className?: string;

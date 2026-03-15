@@ -5,8 +5,10 @@ import {
   GoogleWebSearchResponse,
 } from "../types/search";
 
-const apiKey = process.env.GOOGLE_API_KEY;
-const cx = process.env.GOOGLE_CX_KEY;
+import {
+  getGoogleSearchConfig,
+  normalizeGoogleSearchError,
+} from "./googleSearchConfig";
 
 /**
  * Calls Google Custom Search API with the given query for web results.
@@ -16,6 +18,7 @@ const cx = process.env.GOOGLE_CX_KEY;
 export async function googleWebSearch(
   params: GoogleWebSearchRequest,
 ): Promise<GoogleWebSearchResponse> {
+  const { apiKey, cx } = getGoogleSearchConfig();
   const {
     query,
     num = 10,
@@ -27,18 +30,23 @@ export async function googleWebSearch(
   } = params;
 
   const url = "https://www.googleapis.com/customsearch/v1";
-  const response = await axios.get<GoogleWebSearchResponse>(url, {
-    params: {
-      key: apiKey,
-      cx,
-      q: query,
-      num,
-      cr,
-      gl,
-      siteSearch,
-      exactTerms,
-      dateRestrict,
-    },
-  });
-  return response.data;
+  try {
+    const response = await axios.get<GoogleWebSearchResponse>(url, {
+      params: {
+        key: apiKey,
+        cx,
+        q: query,
+        num,
+        cr,
+        gl,
+        siteSearch,
+        exactTerms,
+        dateRestrict,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    return normalizeGoogleSearchError(error);
+  }
 }
